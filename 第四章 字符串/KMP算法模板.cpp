@@ -11,7 +11,7 @@ void get_next() // 计算next数组
     nxt[0] = -1;
     while (i < len_pat) // 不是len-1，因为就是要计算nxt[len_pat]
         if (j == -1 || pat[i] == pat[j])
-            nxt[++i] = ++j, nxt[i] = (pat[i] == pat[nxt[i]] ? nxt[nxt[i]] : nxt[i]); //加上对nxt[i]的优化成为nextval数组
+            nxt[++i] = ++j, nxt[i] = (pat[i] == pat[j] ? nxt[j] : nxt[i]); //加上对nxt[i]的优化成为nextval数组
         else
             j = nxt[j];
 }
