@@ -1,36 +1,39 @@
-#include <string>
 #include <iostream>
+#include <string>
 using namespace std;
-#define endl '\n'
 
-string tar, pat;
-int nxt[1000001];
-void get_next() // 计算next数组
+const int N = 1e6 + 1;
+string a, b;
+int nxt[N], nxtval[N], la, lb;
+void GetNext()
 {
-    int i = 0, j = -1, len_pat = pat.length();
-    nxt[0] = -1;
-    while (i < len_pat) // 不是len-1，因为就是要计算nxt[len_pat]
-        if (j == -1 || pat[i] == pat[j])
-            nxt[++i] = ++j, nxt[i] = (pat[i] == pat[j] ? nxt[j] : nxt[i]); //加上对nxt[i]的优化成为nextval数组
+    nxt[0] = nxtval[0] = -1;
+    int i = 0, j = -1; //计算nxt数组将指针初始化为0和-1！！！
+    while (i < lb)
+        if (j == -1 || b[i] == b[j])
+            nxt[++i] = ++j, nxtval[i] = j, nxtval[i] = (b[i] == b[j] ? nxtval[j] : nxtval[i]); //加上对nxt[i]的优化成为nxtval数组
         else
             j = nxt[j];
 }
+void KMP()
+{
+    int i = 0, j = 0;
+    while (i < la)
+    {
+        if (j == -1 || a[i] == b[j]) //匹配了就增加指针
+            i++, j++;
+        else //不匹配就将模式串指针回溯，从而从模式串更靠前的位置开始匹配
+            j = nxtval[j];
+        if (j == lb)
+            cout << i - lb + 1 << endl, j = nxtval[j]; //输出每一个匹配的字符串位置只用加上j = nxt[j]即可！！！
+    }
+}
 int main()
 {
-    ios::sync_with_stdio(false), cin.tie(0);
-    while (cin >> tar >> pat && tar != ".") //输入目标串tar和模式串pat
-    {
-        int len_pat = pat.length(), len_tar = tar.length();
-        get_next();
-        for (int i = 0; i < len_pat; i++)
-            cout << nxt[i] << ' ';
-        cout << endl;
-        int i = 0, j = 0;
-        while (i < len_tar && j < len_pat)
-            if (j == -1 || tar[i] == pat[j])
-                i++, j++;
-            else
-                j = nxt[j];
-        cout << (j >= len_pat ? to_string(i - len_pat + 1) : "No Match") << endl; //输出目标串的第几个字符与模式串的第一个字符匹配
-    }
+    cin >> a >> b;
+    la = a.length(), lb = b.length();
+    GetNext();
+    KMP();
+    for (int i = 1; i <= lb; i++)
+        cout << nxt[i] << ' '; //输出模式串前i个字母中最长的相同前后缀
 }
