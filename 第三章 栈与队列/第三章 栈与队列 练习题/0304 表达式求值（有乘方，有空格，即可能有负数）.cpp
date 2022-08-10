@@ -56,7 +56,10 @@ int main()
         while (!f.empty())
         {
             tmp = f.substr(0, f.find(' '));
-            f.erase(0, tmp.length() + 1); // string::find(int pos, int len)不到就返回-1而不是string::end()!!!
+            f.erase(0, f.find(' '));
+            f.erase(0, 1); //消除空格
+            // string::find(int pos, int len)不到就返回string::npos!!!
+            //只剩下一个操作数则f.find(' ') 返回unsigned int最大值，如果f.erase(0, f.find(' ') + 1) 则会溢出导致最后一个操作数一直不被删除
             if ((tmp[0] >= '0' && tmp[0] <= '9') || (tmp[0] == '-' && tmp.length() > 1))
                 ans.push(atoi(tmp.c_str()));
             else if (tmp[0] == ')')
