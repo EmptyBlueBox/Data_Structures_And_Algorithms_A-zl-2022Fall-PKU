@@ -27,7 +27,7 @@ int main()
         ok = false;
         int l = 0, r = 0;    //经过的括号个数
         int node_sum = 0;    //经过的节点个数
-        stack<int> pre_node; //存的是节点的序号，还不知道全部子节点的节点，也即DFS经过的节点，也包含叶子结点
+        stack<int> pre_node; //存的是节点的序号，不知道全部子节点的节点，也即DFS经过的节点，也包含叶子结点
         while (true)         //构建树
         {
             char c = cin.peek();
