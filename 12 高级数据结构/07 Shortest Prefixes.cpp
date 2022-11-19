@@ -32,7 +32,7 @@ string find_prefix(string x)
     string ans;
     for (int i = 0; i < len; i++)
     {
-        if (cur->cnt == 1)
+        if (cur->cnt == 1) // root的时候就加入了第一个字母，因此在遇到cnt==0时，对应的字母已经加入了
             return ans;
         ans += x[i];
         cur = cur->ch[x[i] - 'a'];
