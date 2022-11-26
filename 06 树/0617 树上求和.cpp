@@ -8,66 +8,66 @@ tricky tests:
 #include <iostream>
 using namespace std;
 
+bool has_path = false;
 int goal;
-bool flag;
 
-inline char get_char_and_blank()
+//读取一段可能的空白与这之后的一个字符
+char get_blank_and_char()
 {
     char c;
     do
         c = getchar();
-    while (c == ' ' || c == '\n' || c == '\t' || c == EOF);
+    while (c == ' ' || c == '\t' || c == '\n');
     return c;
 }
 
-inline int readNumber()
+//默认前面没有空白
+int get_integer()
 {
-    int res = 0;
-    bool sgn = false;
+    int positive;
     char c;
-    do
-    {
-        c = getchar();
-        if (c == '-')
-            sgn = true;
-    } while (c < '0' || c > '9');
-    do
-    {
-        res = res * 10 + c - '0';
-        c = getchar();
-    } while (c >= '0' && c <= '9');
-    ungetc(c, stdin);
-    return sgn ? -res : res;
+    //处理负号
+    c = getchar();
+    positive = (c == '-' ? 0 : 1);
+    if (c != '-') //不是负号放回去
+        ungetc(c, stdin);
+    //快读一个数
+    int num = 0;
+    while ((c = getchar()) >= '0' && c <= '9')
+        num = num * 10 + c - '0';
+    ungetc(c, stdin); //最后一定多读了一个才能判断不在数字内
+
+    return positive ? num : -num;
 }
 
-bool isEmpty(int cur)
+bool is_leaf(int path_sum)
 {
+    //找到答案也不能立刻返回，要读完所有的数
     char c;
-    int t;
+    int num;
 
-    c = get_char_and_blank(); //左括号
-    c = get_char_and_blank(); //右括号或者数字
-    if (c == ')')
+    get_blank_and_char();                  //读取左括号
+    if ((c = get_blank_and_char()) == ')') //读了所有的空白字符，如果直接是右括号了
         return true;
+    else                                       //不是右括号那就是数字了
+        ungetc(c, stdin), num = get_integer(); //读取数字
 
-    ungetc(c, stdin);
-    t = readNumber();
-    int f1 = isEmpty(cur + t);
-    int f2 = isEmpty(cur + t);
-    if (f1 && f2 && cur + t == goal) //左右子树为NULL并且当前节点是最后一个节点
-        flag = true;
+    bool l_is_leaf = is_leaf(path_sum + num);             //看左子树是否只有一对括号
+    bool r_is_leaf = is_leaf(path_sum + num);             //看右子树是否只有一对括号
+    if (l_is_leaf && r_is_leaf && path_sum + num == goal) //左右均是括号且路径和为目标数字
+        has_path = true;
 
-    c = get_char_and_blank(); //读右括号
-    return false;             //当前节点不是NULL节点
+    get_blank_and_char(); //读取右括号
+    return false;         //不是只有括号的叶子节点
 }
 
 int main()
 {
-    while (~scanf("%d", &goal))
+    while (~scanf("%d", &goal)) //当不是-1(EOF)时
     {
-        flag = 0;
-        isEmpty(0);
-        puts(flag ? "yes" : "no");
+        has_path = false;
+        is_leaf(0);
+        puts(has_path ? "yes" : "no"); // puts会自动补充换行符
     }
 }
 

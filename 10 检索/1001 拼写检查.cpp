@@ -6,9 +6,9 @@
 #include <unordered_set>
 #include <vector>
 using namespace std;
-unordered_map<string, int> dict; //字典，并且用unordered_map储存是字典中的第几个，方便排序（但是map都占内存，不要求按顺序来就用unordered_mao）
+unordered_map<string, int> dict; //字典，并且用unordered_map储存是字典中的第几个，方便排序（但是map都占内存，不要求按顺序来就用unordered_map）
 unordered_set<string> similars;  //找到所有的相似字符串并除重
-vector<string> ans;              //对set<string>重载<比较麻烦，放进vector再sort
+vector<string> ans;              //对set<string>重载小于号比较麻烦，放进vector再sort
 
 bool cmp(const string a, const string b)
 {

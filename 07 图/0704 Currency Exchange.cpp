@@ -21,7 +21,7 @@ bool SPFA(int s, double v) // v的类型不是int！！！
     //如果某个节点入队了n次，说明有正环，但是不一定回到源点。回到源点的判断比较简单，只需判断max_money[s]是否变大即可
     // int vis_num[101]={0};
     // vis_num[s] = 1;
-    double max_money[101] = {0}; //对每一种钱，现在得到的最多钱数
+    double max_money[101] = {0}; //对每一种钱，现在得到的最多钱数，相当于dis[]
     max_money[s] = v;
     while (!q.empty())
     {

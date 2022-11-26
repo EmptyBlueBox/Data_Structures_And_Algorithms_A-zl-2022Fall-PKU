@@ -3,6 +3,7 @@
 #include <set>
 using namespace std;
 
+//最小生成树
 struct edge
 {
     int from, to, weight;
@@ -18,15 +19,13 @@ int find(int x)
 }
 void merge(int x, int y)
 {
-    int fx = find(x), fy = find(y);
-    if (fx != fy)
-        fa[fx] = fy;
+    fa[find(x)] = find(y);
 }
 int main()
 {
     for (int i = 0; i < 26; i++) //初始化父亲数组
         fa[i] = i;
-    priority_queue<edge> s; //用来每次找最小边权的边，尽量不要用set
+    priority_queue<edge> s; //用来每次找最小边权的边，尽量不要用set，不方便删除
     int n;
     cin >> n;
     for (int i = 0; i < n - 1; i++)
