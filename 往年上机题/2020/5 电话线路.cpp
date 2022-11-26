@@ -15,6 +15,7 @@ vector<pii> edge[1001];
 // SPFA找1->n的最短路径，大于x算长度为1，最短路径<=k时该价钱可以建起来线路
 bool possible_price(int x)
 {
+
 #ifdef SPFA
 
     // SPFA
@@ -31,7 +32,7 @@ bool possible_price(int x)
         q.pop();             //与Dijkstra和Prim等贪心算法不同，SPFA是暴力松弛，不用判定是否非法
         in_queue[cur] = false;
         for (auto i : edge[cur])
-            if (dis[i.second] > dis[cur] + (i.first > x))
+            if (dis[i.second] > dis[cur] + (i.first > x)) //放入队列的条件：被松弛了且队列里没有
             {
                 dis[i.second] = dis[cur] + (i.first > x); //松弛终点为i.second
                 if (!in_queue[i.second])
@@ -58,8 +59,8 @@ bool possible_price(int x)
         if (vis[cur])
             continue;
         vis[cur] = true;
-        for (auto i : edge[cur])
-            if (dis[i.second] > dis[cur] + (i.first > x)) //更新一圈节点的最小路径，被更新的放进队列
+        for (auto i : edge[cur])                          //松弛一圈节点，被更新的放进队列
+            if (dis[i.second] > dis[cur] + (i.first > x)) //放入队列的条件：被松弛了
                 dis[i.second] = dis[cur] + (i.first > x), q.push({dis[i.second], i.second});
     }
     if (dis[n] == 0x3f3f3f3f)
