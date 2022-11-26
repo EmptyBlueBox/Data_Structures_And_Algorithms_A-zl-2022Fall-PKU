@@ -1,10 +1,10 @@
-// SPFA判环，queue存将要松弛的节点，使用vector模拟邻接表
-// 通过松弛维护一个最短路径（最多钱数）数组
 #include <iostream>
 #include <queue>
 #include <vector>
 using namespace std;
 
+// SPFA判环，queue存将要松弛的节点，使用vector模拟邻接表
+// 通过松弛维护一个最短路径（最多钱数）数组
 struct edge
 {
     int to;

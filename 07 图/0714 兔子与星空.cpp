@@ -3,7 +3,7 @@
 #include <set>
 using namespace std;
 
-//最小生成树
+//最小生成树 Kruskal
 struct edge
 {
     int from, to, weight;
