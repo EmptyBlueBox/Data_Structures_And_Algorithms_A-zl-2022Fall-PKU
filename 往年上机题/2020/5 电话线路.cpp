@@ -69,6 +69,7 @@ bool possible_price(int x)
 
 #endif
 }
+
 int main()
 {
     cin >> n >> m >> k;
