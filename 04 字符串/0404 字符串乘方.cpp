@@ -8,7 +8,7 @@ void Get_Next()
     int i = 0, j = -1, l = a.length();
     nxt[0] = -1;
     while (i < l)
-        if (j == -1 || a[i] == a[j])
+        if (j == -1 || a[i] == a[j]) // j == -1!!!
             nxt[++i] = ++j;
         else
             j = nxt[j];

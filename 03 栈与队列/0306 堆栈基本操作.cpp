@@ -5,26 +5,33 @@ using namespace std;
 
 int main()
 {
-    int n, p = 1;
+    int n;
     cin >> n;
+    int nxt_push = 1;
     stack<int> s;
-    string ans;
-    for (int i = 0; i < n; i++)
+    string ans; //用string存答案
+    for (int i = 1; i <= n; i++)
     {
-        int tmp;
-        cin >> tmp;
-        if (tmp < 1 || tmp > n || (!s.empty() && tmp < s.top()))
+        int cur;
+        cin >> cur;
+        if (cur > n)
         {
-            cout << "NO" << endl;
+            cout << "NO\n";
             return 0;
         }
-        else if (!s.empty() && tmp == s.top())
-            ans += "POP " + to_string(tmp) + "\n", s.pop();
+        if (!s.empty() && s.top() == cur)
+            ans += "POP " + to_string(cur) + '\n', s.pop();
+        else if (cur < nxt_push)
+        {
+            cout << "NO\n";
+            return 0;
+        }
         else
         {
-            for (; p <= tmp; p++)
-                ans += "PUSH " + to_string(p) + "\n", s.push(p);
-            ans += "POP " + to_string(tmp) + "\n", s.pop();
+            while (nxt_push < cur)
+                ans += "PUSH " + to_string(nxt_push) + '\n', s.push(nxt_push++);
+            nxt_push++;
+            ans += "PUSH " + to_string(cur) + '\n' + "POP " + to_string(cur) + '\n';
         }
     }
     cout << ans;

@@ -3,7 +3,7 @@
 using namespace std;
 
 int info[1000001] = {0};
-deque<int> dq;
+deque<int> dq; //永远把新元素push到尾部，dq[i]一定递减，而info[dq[i]]可能递增或者递减
 int main()
 {
     int n, k;
