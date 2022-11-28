@@ -6,13 +6,13 @@ using namespace std;
 
 //二分SPFA或Dijkstra
 #define SPFA
-#define Dijkstra
+// #define Dijkstra
 
 #define pii pair<int, int>
 int n, m, k;
 bool no_path = false; //注意判断无路径-1
 vector<pii> edge[1001];
-// SPFA找1->n的最短路径，大于x算长度为1，最短路径<=k时该价钱可以建起来线路
+// 找1->n的最短路径，大于x算长度为1，最短路径<=k时该价钱可以建起来线路
 bool possible_price(int x)
 {
 
@@ -29,39 +29,42 @@ bool possible_price(int x)
     while (!q.empty())
     {
         int cur = q.front(); //下一个用来作为松弛起点的点
-        q.pop();             //与Dijkstra和Prim等贪心算法不同，SPFA是暴力松弛，不用判定是否非法
+        q.pop();             //与Dijkstra和Prim等贪心算法不同，SPFA是一直松弛，不用判定是否非法（指已有最短路径）
         in_queue[cur] = false;
-        for (auto i : edge[cur])
-            if (dis[i.second] > dis[cur] + (i.first > x)) //放入队列的条件：被松弛了且队列里没有
+        for (auto e : edge[cur])
+            if (dis[e.second] > dis[cur] + (e.first > x)) //可以被松弛
             {
-                dis[i.second] = dis[cur] + (i.first > x); //松弛终点为i.second
-                if (!in_queue[i.second])
-                    q.push(i.second), in_queue[i.second] = true;
+                dis[e.second] = dis[cur] + (e.first > x);
+                if (!in_queue[e.second]) //如果队列中没有松弛终点，那么把松弛终点放入队列
+                    q.push(e.second), in_queue[e.second] = true;
             }
     }
     if (dis[n] == 0x3f3f3f3f)
         no_path = true;
     return dis[n] <= k;
 
-#elif Dijkstra
+#endif
+
+#ifdef Dijkstra
 
     // Dijkstra
     priority_queue<pii, vector<pii>, greater<pii>> q;
     q.push({0, 1});
-    bool vis[1001] = {false};
-    int dis[1001];
+    int dis[1001]; //最开始没有有最短路径的点，不要初始化dis[0] = 0
     memset(dis, 0x3f, sizeof(dis));
-    dis[1] = 0;
     while (!q.empty())
     {
-        int cur = q.top().second; //下一个扩入的节点，这个节点的距离只是用来贪心排序的，不用放进cur
-        q.pop();
-        if (vis[cur])
+        int cur = q.top().second;   //下一个扩入的节点，这个节点的距离只是用来贪心排序的，不用放进cur
+        if (dis[cur] != 0x3f3f3f3f) //先判断是否已经有了最短路径
+        {
+            q.pop(); //没用的节点一定要pop
             continue;
-        vis[cur] = true;
-        for (auto i : edge[cur])                          //松弛一圈节点，被更新的放进队列
-            if (dis[i.second] > dis[cur] + (i.first > x)) //放入队列的条件：被松弛了
-                dis[i.second] = dis[cur] + (i.first > x), q.push({dis[i.second], i.second});
+        }
+        dis[cur] = q.top().first; //找到最短路径之后再更新dis
+        q.pop();
+        for (auto e : edge[cur])             //查看一圈节点
+            if (dis[e.second] == 0x3f3f3f3f) //把所有未产生最短路径的节点与其可能的最短路径放入队列
+                q.push({dis[cur] + (e.first > x), e.second});
     }
     if (dis[n] == 0x3f3f3f3f)
         no_path = true;
