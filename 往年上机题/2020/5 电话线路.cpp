@@ -55,7 +55,7 @@ bool possible_price(int x)
     while (!q.empty())
     {
         int cur = q.top().second;   //下一个扩入的节点，这个节点的距离只是用来贪心排序的，不用放进cur
-        if (dis[cur] != 0x3f3f3f3f) //先判断是否已经有了最短路径
+        if (dis[cur] != 0x3f3f3f3f) //贪心算法一定先判断是否已经有了最短路径，因为可能许多一样的节点有不同的距离都在队列里
         {
             q.pop(); //没用的节点一定要pop
             continue;

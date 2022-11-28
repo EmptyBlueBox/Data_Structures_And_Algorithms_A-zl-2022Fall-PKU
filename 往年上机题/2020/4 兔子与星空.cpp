@@ -39,7 +39,8 @@ int main()
         vis[nxt.second] = true;
         ans += nxt.first;
         for (auto i : edge[nxt.second]) //生成树不用判断距离小于原距离，因为根本没有距离这个概念
-            q.push(i);
+            if (!vis[i.second])         //把所有不在生成树中的节点与节点和生成树的可能最短距离放入队列
+                q.push(i);
     }
     cout << ans << endl;
 }
