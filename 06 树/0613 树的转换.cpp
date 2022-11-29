@@ -1,43 +1,29 @@
 #include <iostream>
 #include <string>
-#include <stack>
 using namespace std;
 
-struct node
+string a;
+int ans1 = -1, ans2 = -1, idx = 0, len;
+void dfs(int d1, int d2) //一个函数对应树的一层
 {
-    node *l = NULL;
-    node *r = NULL;
-};
-int get_height(node *x)
-{
-    if (!x)
-        return 0;
-    else
-        return max(get_height(x->l), get_height(x->r)) + 1;
+    ans1 = max(ans1, d1);
+    ans2 = max(ans2, d2);
+    int cnt = 0;
+    while (idx < len)
+        if (a[idx++] == 'd')                  //遇到d
+            dfs(d1 + 1, d2 + cnt + 1), cnt++; //树深度加1，二叉树深度加已有的左子树个数加1
+        else
+            return; //离开当前层
 }
+
 int main()
 {
-    string a;
-    int N = 0;
+    int cnt = 0;
     while (cin >> a && a != "#")
     {
-        int h1 = 0, h2 = 0, len = a.length();
-        for (int i = 0, h_now = 0; i < len; i++)
-            h_now += (a[i] == 'd' ? 1 : -1), h1 = max(h1, h_now);
-        node *root = new node;
-        node *cur = root;
-        stack<node *> pre_root; //在树上的上一层的父节点和同一层的上一个节点
-        for (int i = 0; i < len; i++)
-            if (a[i] == 'd') //走到树的下一层
-            {
-                if (!i || a[i - 1] == 'd') //下一层再下一层
-                    pre_root.push(cur), cur->l = new node, cur = cur->l;
-                else //上一层再下一层
-                    cur->r = new node, cur = cur->r;
-            }
-            else if (!pre_root.empty() && a[i - 1] == 'u')
-                cur = pre_root.top(), pre_root.pop();
-        h2 = get_height(root);
-        printf("Tree %d: %d => %d\n", ++N, h1, h2 - 1);
+        ans1 = -1, ans2 = -1, idx = 0, len = a.length();
+        dfs(0, 0);
+        printf("Tree %d: ", ++cnt);
+        cout << ans1 << " => " << ans2 << endl; //左右有空格
     }
 }
