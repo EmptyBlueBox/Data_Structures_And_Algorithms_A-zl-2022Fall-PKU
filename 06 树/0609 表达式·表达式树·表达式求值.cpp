@@ -1,155 +1,163 @@
 #include <iostream>
-#include <cstring>
+#include <string>
+#include <algorithm>
 #include <stack>
-#include <map>
-#define MAXROW 70
-#define MAXCOL 300
+#include <unordered_map>
+#include <cstring>
+#include <cctype>
+#define LIM 500
 using namespace std;
-char buf[MAXROW][MAXCOL];
-map<char, int> m;
-int pow(int x, int y)
+unordered_map<char, int> symtab;
+char exprTree[LIM][LIM];
+
+struct Node
 {
-    int result = 1;
-    for (int i = 0; i < y; ++i)
-        result *= x;
-    return result;
-}
-struct btn
-{
-    char data;
-    struct btn *left;
-    struct btn *right;
-    btn(char c) : data(c)
-    {
-        left = NULL;
-        right = NULL;
-    }
+    char symbol;
+    Node *left, *right;
 };
-int tree_layers(btn *root)
+unordered_map<Node *, bool> isLeaf;
+
+inline int get_depth(Node *root)
 {
-    int left, right;
     if (!root)
         return 0;
-    left = tree_layers(root->left);
-    right = tree_layers(root->right);
-    return left > right ? left + 1 : right + 1;
+    return max(get_depth(root->left), get_depth(root->right)) + 1;
 }
-void print_tree(btn *root, int root_x, int root_y, int space)
+
+inline string infix_to_suffix(const string &str)
 {
-    int left_child, right_child;
-    if (!root)
-        return;
-    buf[root_y][root_x - 1] = root->data;
-    if (root->left)
-    {
-        buf[root_y + 1][root_x - 2] = '/';
-        print_tree(root->left, root_x - space, root_y + 2, space >> 1);
-    }
-    if (root->right)
-    {
-        buf[root_y + 1][root_x] = '\\';
-        print_tree(root->right, root_x + space, root_y + 2, space >> 1);
-    }
-}
-int calculate(btn *root)
-{
-    if (isalpha(root->data))
-        return m[root->data];
-    if (root->data == '+')
-        return calculate(root->left) + calculate(root->right);
-    if (root->data == '-')
-        return calculate(root->left) - calculate(root->right);
-    if (root->data == '*')
-        return calculate(root->left) * calculate(root->right);
-    if (root->data == '/')
-        return calculate(root->left) / calculate(root->right);
-}
-int main()
-{
-    char inexp[52], preexp[52], tmp;
+    string ret;
     stack<char> s;
-    cin >> inexp;
-    int len = strlen(inexp), j = 0, v_count, val;
-    cin >> v_count;
-    for (int i = 0; i < v_count; ++i)
+    for (auto &&c : str)
     {
-        cin >> tmp >> val;
-        m[tmp] = val;
-    }
-    for (int i = 0; i < len; ++i)
-    {
-        if (isalpha(inexp[i]))
-            preexp[j++] = inexp[i];
-        else if (inexp[i] == '(')
-            s.push(inexp[i]);
-        else if (inexp[i] == ')')
+        if (isalpha(c))
+        { // if is a symbol
+            ret += c;
+        }
+        else if (c == '(')
+        {
+            s.push(c);
+        }
+        else if (c == ')')
         {
             while (s.top() != '(')
-            {
-                preexp[j++] = s.top();
+            { // the string must be valid, so we dont have to check isEmpty
+                ret += s.top();
                 s.pop();
             }
             s.pop();
         }
-        else if (inexp[i] == '+' || inexp[i] == '-')
+        else if (c == '+' || c == '-')
         {
             while (!s.empty() && s.top() != '(')
             {
-                preexp[j++] = s.top();
+                ret += s.top();
                 s.pop();
             }
-            s.push(inexp[i]);
+            s.push(c);
         }
         else
-        {
+        { // * or /
             while (!s.empty() && (s.top() == '*' || s.top() == '/'))
             {
-                preexp[j++] = s.top();
+                ret += s.top();
                 s.pop();
             }
-            s.push(inexp[i]);
+            s.push(c);
         }
     }
     while (!s.empty())
     {
-        preexp[j++] = s.top();
+        ret += s.top();
         s.pop();
     }
-    preexp[j] = '\0';
-    cout << preexp << endl;
-    btn *root;
-    stack<btn *> s1;
-    for (int i = 0; i < j; ++i)
+    return ret;
+}
+
+int calc(Node *root)
+{
+    switch (root->symbol)
     {
-        root = new btn(preexp[i]);
-        if (!isalpha(preexp[i]))
-        {
-            root->right = s1.top();
-            s1.pop();
-            root->left = s1.top();
-            s1.pop();
-        }
-        s1.push(root);
+    case '+':
+        return calc(root->left) + calc(root->right);
+    case '-':
+        return calc(root->left) - calc(root->right);
+    case '*':
+        return calc(root->left) * calc(root->right);
+    case '/':
+        return calc(root->left) / calc(root->right);
+    default:
+        return symtab[root->symbol];
     }
-    memset(buf, ' ', sizeof(buf));
-    int n = tree_layers(root);
-    print_tree(root, pow(2, n - 1), 0, pow(2, n - 2));
-    int effective_lines = 0;
-    for (int i = 0; i < MAXROW; ++i)
+}
+
+void print_exprTree(Node *root, int x, int y, int span)
+{
+    if (!root)
+        return;
+    exprTree[x][y - 1] = root->symbol;
+    if (root->left)
     {
-        j = MAXCOL - 1;
-        while (j >= 0 && buf[i][j] == ' ')
-            --j;
-        if (j > -1)
+        exprTree[x + 1][y - 2] = '/';
+        print_exprTree(root->left, x + 2, y - span, span >> 1);
+    }
+    if (root->right)
+    {
+        exprTree[x + 1][y] = '\\';
+        print_exprTree(root->right, x + 2, y + span, span >> 1);
+    }
+}
+
+int main()
+{
+    string infix;
+    int n;
+    cin >> infix >> n;
+    for (int i = 0; i < n; i++)
+    {
+        char var;
+        int val;
+        cin >> var >> val;
+        symtab[var] = val;
+    }
+    // calc suffixExpr
+    string suffix = infix_to_suffix(infix);
+    cout << suffix << endl;
+    // build exprTree
+    Node *root = nullptr;
+    stack<Node *> s;
+    for (auto &c : suffix)
+    {
+        root = new Node{c, nullptr, nullptr};
+        if (!isalpha(c))
         {
-            ++effective_lines;
-            buf[i][j + 1] = '\0';
+            root->right = s.top();
+            s.pop();
+            root->left = s.top();
+            s.pop();
+        }
+        s.push(root);
+    }
+    int d = get_depth(root);
+    memset(exprTree, ' ', sizeof(exprTree));
+    print_exprTree(root, 0, 1 << (d - 1), 1 << (d - 2));
+    int lineCnt = 0;
+    for (int i = 0; i < LIM; i++)
+    {
+        int j = LIM - 1;
+        while (j >= 0 && exprTree[i][j] == ' ')
+            j--;
+        if (j > -1)
+        { // if this line is not empty
+            lineCnt++;
+            exprTree[i][j + 1] = '\0';
         }
         else
             break;
     }
-    for (int i = 0; i < effective_lines; ++i)
-        cout << buf[i] << endl;
-    cout << calculate(root) << endl;
-    return 0;
+    for (int i = 0; i < lineCnt; i++)
+    {
+        cout << exprTree[i] << endl;
+    }
+    cout << calc(root) << endl;
 }

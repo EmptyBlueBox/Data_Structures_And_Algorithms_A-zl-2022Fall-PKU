@@ -5,65 +5,67 @@ using namespace std;
 
 struct node
 {
-    char info;
     node *l = NULL;
     node *r = NULL;
+    bool has_left = true;
+    char info;
 };
-void print_prefix(node *x)
+
+void pre(node *x)
 {
     cout << x->info;
     if (x->l)
-        print_prefix(x->l);
+        pre(x->l);
     if (x->r)
-        print_prefix(x->r);
+        pre(x->r);
 }
-void print_suffix(node *x)
+
+void in(node *x)
 {
     if (x->l)
-        print_suffix(x->l);
-    if (x->r)
-        print_suffix(x->r);
+        in(x->l);
     cout << x->info;
+    if (x->r)
+        in(x->r);
 }
-void print_infix(node *x)
+
+void suf(node *x)
 {
     if (x->l)
-        print_infix(x->l);
-    cout << x->info;
+        suf(x->l);
     if (x->r)
-        print_infix(x->r);
+        suf(x->r);
+    cout << x->info;
 }
+
 int main()
 {
     int N;
     cin >> N;
     while (N--)
     {
-        string tmp;
-        node *father[101] = {NULL};   //上面最近的深i的节点指针,father[0]为root指针
-        bool taken_up[101] = {false}; //记录*或者节点占据了左孩子
-        while (cin >> tmp && tmp != "0")
+        node *root = new node;
+        cin >> root->info;
+
+        node *a[101]; //最近的有i个'-'的祖先节点
+        a[0] = root;
+
+        string cur;
+        while (cin >> cur && cur != "0")
         {
-            int n = count(tmp.begin(), tmp.end(), '-');
-            if (tmp.back() == '*')
-                taken_up[n - 1] = true;
+            int depth = count(cur.begin(), cur.end(), '-');
+            if (cur.back() == '*')
+                a[depth - 1]->has_left = false;
+            else if (a[depth - 1]->has_left && !a[depth - 1]->l) //父节点有左子节点且没有放左子节点那就放进去
+                a[depth - 1]->l = new node, a[depth] = a[depth - 1]->l, a[depth]->info = cur.back();
             else
-            {
-                node *add = new node;
-                add->info = tmp.back();
-                father[n] = add, taken_up[n] = false;
-                if (n) //不是root
-                {
-                    if (taken_up[n - 1])
-                        father[n - 1]->r = add;
-                    else
-                        father[n - 1]->l = add, taken_up[n - 1] = true;
-                }
-            }
+                a[depth - 1]->r = new node, a[depth] = a[depth - 1]->r, a[depth]->info = cur.back();
         }
-        print_prefix(father[0]), cout << endl;
-        print_suffix(father[0]), cout << endl;
-        print_infix(father[0]), cout << endl;
+        pre(root);
         cout << endl;
+        suf(root);
+        cout << endl;
+        in(root);
+        cout << "\n\n";
     }
 }
