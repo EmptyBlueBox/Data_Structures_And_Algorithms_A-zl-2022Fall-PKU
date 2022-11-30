@@ -1,43 +1,46 @@
 #include <iostream>
 #include <vector>
 using namespace std;
-#define infix info
-#define suffix (&info[len])
+
 struct node
 {
     int info;
-    node *l;
-    node *r;
+    node *l = NULL;
+    node *r = NULL;
 };
+
 vector<int> info;
 int len;
-void get_tree(node *&root, int l1, int l2, int r1, int r2) //构建节点root，root要传引用
+void build_tree(node *root, int l1, int r1, int l2, int r2)
 {
-    if (l1 > l2 || r1 > r2)
-        return;
-    root = new node{suffix[r2], NULL, NULL};
-    int loc_r2;
-    for (loc_r2 = l1; loc_r2 <= l2; loc_r2++)
-        if (infix[loc_r2] == suffix[r2])
-            break;
-    get_tree(root->l, l1, loc_r2 - 1, r1, r1 + loc_r2 - l1 - 1);
-    get_tree(root->r, loc_r2 + 1, l2, r1 + loc_r2 - l1, r2 - 1);
+    int mid = info[r2];
+    root->info = mid;
+    for (int i = l1, a = 0, b = r1 - l1; i <= r1; i++, a++, b--) // a为左子树的节点数，b为右子树的节点数
+        if (info[i] == mid)
+        {
+            if (a)
+                root->l = new node, build_tree(root->l, l1, i - 1, l2, l2 + a - 1); //左子树至少一个节点
+            if (b)
+                root->r = new node, build_tree(root->r, i + 1, r1, r2 - b, r2 - 1); //右子树至少一个节点
+        }
 }
-void print_prefix(node *x)
+
+void pre(node *x)
 {
     cout << x->info << ' ';
     if (x->l)
-        print_prefix(x->l);
+        pre(x->l);
     if (x->r)
-        print_prefix(x->r);
+        pre(x->r);
 }
+
 int main()
 {
-    int tmp;
-    while (cin >> tmp)
-        info.push_back(tmp);
+    int x;
+    while (cin >> x)
+        info.push_back(x);
     len = info.size() / 2;
-    node *root = NULL;
-    get_tree(root, 0, len - 1, 0, len - 1);
-    print_prefix(root);
+    node *root = new node;
+    build_tree(root, 0, len - 1, len, 2 * len - 1);
+    pre(root);
 }

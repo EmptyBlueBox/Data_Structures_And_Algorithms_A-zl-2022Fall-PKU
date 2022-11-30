@@ -1,56 +1,46 @@
 #include <iostream>
+#include <vector>
 #include <queue>
-#include <set>
 using namespace std;
+#define pip pair<int, pair<int, int>>
 
-//最小生成树 Kruskal
-struct edge
-{
-    int from, to, weight;
-    bool operator<(const edge &other) const
-    {
-        return weight > other.weight;
-    }
-};
-int fa[26];
+int f[128];
 int find(int x)
 {
-    return fa[x] == x ? x : fa[x] = find(fa[x]);
+    return (x == f[x] ? x : f[x] = find(f[x]));
 }
 void merge(int x, int y)
 {
-    fa[find(x)] = find(y);
+    f[find(y)] = find(x);
 }
+
 int main()
 {
-    for (int i = 0; i < 26; i++) //初始化父亲数组
-        fa[i] = i;
-    priority_queue<edge> s; //用来每次找最小边权的边，尽量不要用set，不方便删除
+    for (int i = 0; i < 128; i++)
+        f[i] = i;
     int n;
     cin >> n;
-    for (int i = 0; i < n - 1; i++)
+    priority_queue<pip, vector<pip>, greater<pip>> q;
+    for (int i = 1; i < n; i++)
     {
-        char tmp;
+        char f;
         int cnt;
-        cin >> tmp >> cnt;
-        while (cnt--)
+        cin >> f >> cnt;
+        for (int i = 0; i < cnt; i++)
         {
-            char c;
-            int weight;
-            cin >> c >> weight;
-            s.push({i, c - 'A', weight});
+            char t;
+            int w;
+            cin >> t >> w;
+            q.push({w, {f, t}});
         }
     }
     int ans = 0;
-    while (!s.empty()) //每次看最小边权的边是否连接两个等价类
+    while (!q.empty())
     {
-        edge now = s.top();
-        s.pop();
-        int ff = find(now.from), ft = find(now.to);
-        if (ff == ft)
-            continue;
-        merge(ff, ft);
-        ans += now.weight;
+        int w = q.top().first, x = q.top().second.first, y = q.top().second.second;
+        q.pop();
+        if (find(x) != find(y))
+            ans += w, merge(x, y);
     }
     cout << ans << endl;
 }
