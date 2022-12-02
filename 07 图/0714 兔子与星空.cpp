@@ -4,6 +4,7 @@
 using namespace std;
 #define pip pair<int, pair<int, int>>
 
+//最小生成树 Kruskal
 int f[128];
 int find(int x)
 {
