@@ -7,10 +7,12 @@ int getf(int x)
 {
     return (x == f[x] ? x : f[x] = getf(f[x]));
 }
+
 void merge(int x, int y)
 {
     f[getf(x)] = getf(y);
 }
+
 int main()
 {
     int N;
