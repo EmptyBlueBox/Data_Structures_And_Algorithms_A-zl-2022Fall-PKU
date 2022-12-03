@@ -1,39 +1,39 @@
 #include <iostream>
-#include <cmath>
 #include <algorithm>
+#include <cmath>
 using namespace std;
 
-struct node
+struct point
 {
-    int p[3];
-} a[10];
+    int x, y, z;
+} pt[10];
 struct node_pair
 {
-    int idx, idy;
+    int n1, n2;
     double dis;
-    void get_dis()
+    bool operator<(const node_pair &other) const //另一个结构体也要用const修饰
     {
-        int tmp = 0;
-        for (int i = 0; i < 3; i++)
-            tmp += (a[idx].p[i] - a[idy].p[i]) * (a[idx].p[i] - a[idy].p[i]);
-        dis = sqrt(tmp);
+        return dis > other.dis;
     }
-} pr[45];
-bool cmp(const node_pair x, const node_pair y)
+} pr[100];
+double f(int a, int b)
 {
-    return x.dis > y.dis;
+    return sqrt((pt[a].x - pt[b].x) * (pt[a].x - pt[b].x) + (pt[a].y - pt[b].y) * (pt[a].y - pt[b].y) + (pt[a].z - pt[b].z) * (pt[a].z - pt[b].z));
 }
 int main()
 {
-    int n, pair_cnt = 0;
+    int n;
     cin >> n;
     for (int i = 0; i < n; i++)
-        for (int j = 0; j < 3; j++)
-            cin >> a[i].p[j];
+        cin >> pt[i].x >> pt[i].y >> pt[i].z;
+    int cnt = 0;
     for (int i = 0; i < n; i++)
         for (int j = i + 1; j < n; j++)
-            pr[pair_cnt].idx = i, pr[pair_cnt].idy = j, pr[pair_cnt++].get_dis();
-    stable_sort(pr, pr + pair_cnt, cmp);
-    for (int i = 0; i < pair_cnt; i++)
-        printf("(%d,%d,%d)-(%d,%d,%d)=%.2f\n", a[pr[i].idx].p[0], a[pr[i].idx].p[1], a[pr[i].idx].p[2], a[pr[i].idy].p[0], a[pr[i].idy].p[1], a[pr[i].idy].p[2], pr[i].dis);
+            pr[cnt++] = node_pair{i, j, f(i, j)}; //可以用大括号直接初始化
+    stable_sort(pr, pr + cnt);
+    for (int i = 0; i < cnt; i++)
+    {
+        point a = pt[pr[i].n1], b = pt[pr[i].n2];
+        printf("(%d,%d,%d)-(%d,%d,%d)=%.2f\n", a.x, a.y, a.z, b.x, b.y, b.z, pr[i].dis);
+    }
 }

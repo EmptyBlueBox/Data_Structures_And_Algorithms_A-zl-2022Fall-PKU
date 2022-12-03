@@ -1,46 +1,31 @@
 #include <iostream>
 #include <string>
-#include <vector>
+#include <map>
 #include <set>
 #include <algorithm>
 using namespace std;
 
 int main()
 {
-    vector<string> lib;
-    vector<int> cnt[26];
+    map<string, set<string>> lib;
     string tmp;
     while (cin >> tmp && tmp != "XXXXXX")
     {
-        lib.push_back(tmp);
-        for (int i = 'a'; i <= 'z'; i++)
-            cnt[i - 'a'].push_back(count(tmp.begin(), tmp.end(), i));
+        string key = tmp;
+        sort(key.begin(), key.end());
+        lib[key].insert(tmp);
     }
-    int n = lib.size();
     while (cin >> tmp && tmp != "XXXXXX")
     {
-        int unordered_word[26];
-        for (int i = 'a'; i <= 'z'; i++)
-            unordered_word[i - 'a'] = count(tmp.begin(), tmp.end(), i);
-        set<string> ans;
-        for (int i = 0; i < n; i++)
-        {
-            for (int j = 0; j < 26; j++)
-                if (cnt[j][i] != unordered_word[j])
-                    goto nxt_word;
-            ans.insert(lib[i]);
-        nxt_word:;
-        }
-        if (ans.empty())
-        {
+        string key = tmp;
+        sort(key.begin(), key.end());
+        if (lib[key].empty())
             cout << "NOT A VALID WORD\n******\n";
-            continue;
-        }
-        while (!ans.empty())
+        else
         {
-            cout << *ans.begin() << endl;
-            ans.erase(ans.begin());
+            for (auto &i : lib[key])
+                cout << i << endl;
+            cout << "******\n";
         }
-        cout << "******\n";
     }
 }

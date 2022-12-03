@@ -1,13 +1,14 @@
 #include <iostream>
 using namespace std;
-int cnt = 0;
-void merge_sort(int l, int r, int *a)
+
+int a[20001], tmp[20001], cnt = 0;
+void merge_sort(int l, int r)
 {
-    if (l >= r) //不能是等于！！！
+    if (l >= r) //不能是等于
         return;
-    int mid = (l + r) >> 1;
-    merge_sort(l, mid, a), merge_sort(mid + 1, r, a);
-    int pl = l, pr = mid + 1, p = l, tmp[20001] = {0};
+    int mid = l + ((r - l) >> 1); //+-优先于位运算
+    merge_sort(l, mid), merge_sort(mid + 1, r);
+    int pl = l, pr = mid + 1, p = l;
     while (pl <= mid && pr <= r)
     {
         if (a[pl] <= a[pr])
@@ -27,11 +28,10 @@ int main()
     int n;
     while (cin >> n && n)
     {
-        int a[20001] = {0};
+        cnt = 0;
         for (int i = 0; i < n; i++)
             cin >> a[i];
-        merge_sort(0, n - 1, a);
+        merge_sort(0, n - 1);
         cout << cnt << endl;
-        cnt = 0;
     }
 }

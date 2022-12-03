@@ -1,0 +1,21 @@
+#include <iostream>
+#include <cstring>
+#include <string>
+#include <map>
+#include <set>
+#include <unordered_map>
+#include <unordered_set>
+#include <vector>
+#include <queue>
+#include <stack>
+#include <algorithm>
+#include <cmath>
+#include <iomanip>
+using namespace std;
+#define pii pair<int, int>
+#define pipii pair<int, pair<int, int>>
+#define ppiipii pair<pair<int, int>, pair<int, int>>
+
+int main()
+{
+}
