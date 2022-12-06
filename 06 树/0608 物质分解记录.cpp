@@ -51,9 +51,7 @@ int main()
                 cur = vr;
             }
             if (tmp[0] == '{')
-            {
                 s.push(cur);
-            }
             else if (tmp[0] == '}')
             {
                 cur = s.top();
@@ -86,9 +84,7 @@ int main()
             cout << '\n';
         }
         else
-        {
             cout << "No\n";
-        }
         cin.ignore(); // 自分
         getline(cin, tmp);
         getline(cin, tmp);
