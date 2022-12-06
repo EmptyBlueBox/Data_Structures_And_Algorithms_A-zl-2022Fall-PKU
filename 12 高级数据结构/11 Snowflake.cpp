@@ -1,6 +1,7 @@
 #include <iostream>
 #include <vector>
 using namespace std;
+
 //先用hash_table判断是否有有可能，再在所有可能中找是否真的有一样的
 #define prime 999983
 int info[100000][6];
