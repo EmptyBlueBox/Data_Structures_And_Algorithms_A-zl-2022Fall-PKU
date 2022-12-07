@@ -1,161 +1,63 @@
 #include <iostream>
-#include <string>
-#include <algorithm>
-#include <stack>
-#include <unordered_map>
-#include <cstring>
-#include <cctype>
-#define LIM 500
 using namespace std;
-unordered_map<char, int> symtab;
-char exprTree[LIM][LIM];
+#define int long long
 
-struct Node
+struct node
 {
-    char symbol;
-    Node *left, *right;
-};
-unordered_map<Node *, bool> isLeaf;
-
-inline int get_depth(Node *root)
+    int l = 0, r = 0, fa = 0;
+    int nl = 0, nr = 0;
+    bool is_lc = true;
+} a[50010];
+int bias = 0, ans;
+void count_ini_bias(int x)
 {
-    if (!root)
-        return 0;
-    return max(get_depth(root->left), get_depth(root->right)) + 1;
+    bias += abs(a[x].nl - a[x].nr);
+    if (a[x].l)
+        count_ini_bias(a[x].l);
+    if (a[x].r)
+        count_ini_bias(a[x].r);
 }
-
-inline string infix_to_suffix(const string &str)
+void cal_delta(int x, int up_delta)
 {
-    string ret;
-    stack<char> s;
-    for (auto &&c : str)
-    {
-        if (isalpha(c))
-        {
-            ret += c;
-        }
-        else if (c == '(')
-        {
-            s.push(c);
-        }
-        else if (c == ')')
-        {
-            while (s.top() != '(')
-            {
-                ret += s.top();
-                s.pop();
-            }
-            s.pop();
-        }
-        else if (c == '+' || c == '-')
-        {
-            while (!s.empty() && s.top() != '(')
-            {
-                ret += s.top();
-                s.pop();
-            }
-            s.push(c);
-        }
-        else
-        { // * or /
-            while (!s.empty() && (s.top() == '*' || s.top() == '/'))
-            {
-                ret += s.top();
-                s.pop();
-            }
-            s.push(c);
-        }
-    }
-    while (!s.empty())
-    {
-        ret += s.top();
-        s.pop();
-    }
-    return ret;
-}
-
-int calc(Node *root)
-{
-    switch (root->symbol)
-    {
-    case '+':
-        return calc(root->left) + calc(root->right);
-    case '-':
-        return calc(root->left) - calc(root->right);
-    case '*':
-        return calc(root->left) * calc(root->right);
-    case '/':
-        return calc(root->left) / calc(root->right);
-    default:
-        return symtab[root->symbol];
-    }
-}
-
-void print_exprTree(Node *root, int x, int y, int span)
-{
-    if (!root)
+    if (x == 0)
         return;
-    exprTree[x][y - 1] = root->symbol;
-    if (root->left)
+    if (a[x].l == 0 && a[x].r == 0)
     {
-        exprTree[x + 1][y - 2] = '/';
-        print_exprTree(root->left, x + 2, y - span, span >> 1);
+        ans = min(ans, bias + up_delta);
+        return;
     }
-    if (root->right)
-    {
-        exprTree[x + 1][y] = '\\';
-        print_exprTree(root->right, x + 2, y + span, span >> 1);
-    }
+    if (a[x].nl < a[x].nr)
+        cal_delta(a[x].l, up_delta + 1), cal_delta(a[x].r, up_delta - 1);
+    else if (a[x].nl > a[x].nr)
+        cal_delta(a[x].l, up_delta - 1), cal_delta(a[x].r, up_delta + 1);
+    else
+        cal_delta(a[x].l, up_delta + 1), cal_delta(a[x].r, up_delta + 1);
 }
-
-int main()
+int cal_num(int x)
 {
-    string infix;
+    if (x == 0)
+        return 0;
+    a[x].nl = cal_num(a[x].l);
+    a[x].nr = cal_num(a[x].r);
+    return a[x].nl + a[x].nr + 1;
+}
+signed main()
+{
     int n;
-    cin >> infix >> n;
-    for (int i = 0; i < n; i++)
+    cin >> n;
+    for (int i = 1; i < n; i++)
     {
-        char var;
-        int val;
-        cin >> var >> val;
-        symtab[var] = val;
-    }
-    string suffix = infix_to_suffix(infix);
-    cout << suffix << endl;
-    Node *root = nullptr;
-    stack<Node *> s;
-    for (auto &c : suffix)
-    {
-        root = new Node{c, nullptr, nullptr};
-        if (!isalpha(c))
-        {
-            root->right = s.top();
-            s.pop();
-            root->left = s.top();
-            s.pop();
-        }
-        s.push(root);
-    }
-    int d = get_depth(root);
-    memset(exprTree, ' ', sizeof(exprTree));
-    print_exprTree(root, 0, 1 << (d - 1), 1 << (d - 2));
-    int lineCnt = 0;
-    for (int i = 0; i < LIM; i++)
-    {
-        int j = LIM - 1;
-        while (j >= 0 && exprTree[i][j] == ' ')
-            j--;
-        if (j > -1)
-        { // if this line is not empty
-            lineCnt++;
-            exprTree[i][j + 1] = '\0';
-        }
+        int f, c;
+        cin >> f >> c;
+        a[c].fa = f;
+        if (a[f].l == 0)
+            a[f].l = c;
         else
-            break;
+            a[f].r = c, a[c].is_lc = false;
     }
-    for (int i = 0; i < lineCnt; i++)
-    {
-        cout << exprTree[i] << endl;
-    }
-    cout << calc(root) << endl;
+    cal_num(1);
+    count_ini_bias(1);
+    ans = bias;
+    cal_delta(1, 0);
+    cout << ans << endl;
 }
